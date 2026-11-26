@@ -10,13 +10,14 @@ function input(field) {
     el('option',{value:'false', selected:fallback(field) === false ? '' : undefined},'否'));
   if (field.kind === 'json') return el('textarea', {name:field.name, required:''}, JSON.stringify(fallback(field), null, 2));
   const numeric = ['int','float'].includes(field.kind);
-  return el('input',{name:field.name, required:'', type:numeric ? 'number' : 'text',
+  return el('input',{name:field.name, required:field.required === false ? undefined : '', type:numeric ? 'number' : 'text',
     step:field.kind === 'float' ? 'any' : undefined, value:fallback(field) ?? ''});
 }
 function parse(form, fields) {
   const data = new FormData(form);
   return Object.fromEntries(fields.map(field => {
     const raw = data.get(field.name);
+    if ((raw === '' || raw === null) && field.required === false) return [field.name, null];
     const convert = ['int','float'].includes(field.kind) ? Number :
       ['bool','json'].includes(field.kind) ? JSON.parse : String;
     return [field.name, convert(raw)];
@@ -49,7 +50,24 @@ export function actionForm(action, refresh) {
       notice.classList.add('ok');
       await refresh();
     } catch (error) {
-      notice.textContent = error.message;
+      const rebaseToken = error.payload?.token && error.status === 409 ? error.payload.token : null;
+      if (rebaseToken) {
+        try {
+          evidence.save(rebaseToken);
+          const result = await awaitCompute(rebaseToken, current => {
+            notice.textContent = (error.message || '候选已按现行建议重算') + '；' + (COMPUTE_STATES[current.status] || current.status);
+          });
+          if (result.status === 'rejected') throw new Error(result.detail);
+          notice.textContent = (error.message || '候选已按现行建议重算') + '；新试算 ' + display(result.result);
+          notice.classList.add('ok');
+          await refresh();
+          return;
+        } catch (rebaseError) {
+          notice.textContent = error.message + '；重算查询：' + rebaseError.message;
+        }
+      } else {
+        notice.textContent = error.message;
+      }
       notice.classList.add('error');
     } finally { button.disabled = false; }
   });

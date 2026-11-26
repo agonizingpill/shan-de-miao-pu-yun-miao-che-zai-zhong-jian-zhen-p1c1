@@ -107,6 +107,31 @@
       ],
       "success": "已写入"
     }
+    {
+      "name": "select_holdout",
+      "label": "选为模型留出记录",
+      "path": "/road_observations/select-holdout",
+      "fields": [
+        {
+          "name": "observation",
+          "label": "观察编号或 SENS 号",
+          "kind": "text",
+          "initial": "OBS-QA"
+        },
+        {
+          "name": "holdout_batch",
+          "label": "留出批次（可空）",
+          "kind": "text",
+          "required": false,
+          "initial": ""
+        }
+      ],
+      "help": "只能选择已复核记录；试算未直接填写 holdout_codes 时会自动使用这些留出选择。",
+      "roles": [
+        "reviewer"
+      ],
+      "success": "已选为留出"
+    }
   ]
 };
 

@@ -70,7 +70,50 @@
           "initial": "TRUCK-23"
         }
       ],
-      "help": "先复检车架，再结合签认建议计算可装盘数。",
+      "help": "先复检车架，再结合签认建议计算可装盘数。试算期间仍选原建议；签认换版后新派车应选新现行建议。",
+      "roles": [
+        "operator",
+        "reviewer"
+      ],
+      "success": "已写入"
+    },
+    {
+      "name": "plan_current_dispatch",
+      "label": "按车/路线/班次的现行建议派车",
+      "path": "/haul_dispatches/plan-dispatch",
+      "fields": [
+        {
+          "name": "code",
+          "label": "派车单号",
+          "kind": "text",
+          "initial": "RUN-CURRENT"
+        },
+        {
+          "name": "truck",
+          "label": "计划车架号",
+          "kind": "text",
+          "initial": "TRUCK-23"
+        },
+        {
+          "name": "route",
+          "label": "场内路线",
+          "kind": "text",
+          "initial": "EAST-REEF"
+        },
+        {
+          "name": "cycle",
+          "label": "适用班次",
+          "kind": "text",
+          "initial": "PM-02"
+        },
+        {
+          "name": "lot",
+          "label": "苗盘批号",
+          "kind": "text",
+          "initial": "LOT-QA"
+        }
+      ],
+      "help": "不传建议号时，由后端在同一事务内解析并锁定该车上路线班次的现行建议；已派出的旧单仍照原建议和原单回签。",
       "roles": [
         "operator",
         "reviewer"

@@ -8,7 +8,10 @@ export async function request(path, data) {
   const payload = await response.json();
   if (!response.ok) {
     const detail = Array.isArray(payload.detail) ? payload.detail.map(x => x.loc.at(-1) + ' ' + x.msg).join(' / ') : payload.detail;
-    throw new Error(detail || '请求未完成');
+    const error = new Error(detail || '请求未完成');
+    error.status = response.status;
+    error.payload = payload;
+    throw error;
   }
   return payload;
 }
